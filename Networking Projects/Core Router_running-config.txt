@@ -1,0 +1,338 @@
+!
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Core_router
+!
+!
+!
+enable secret 5 $1$mERr$kku/hiJPh.4Yp8Xor/4kz1
+!
+!
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+username itadmin privilege 15 secret 5 $1$mERr$kku/hiJPh.4Yp8Xor/4kz1
+!
+!
+license udi pid CISCO2911/K9 sn FTX1524OWZ1-
+license boot module c2900 technology-package securityk9
+license boot module c2900 technology-package uck9
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain-lookup
+ip domain-name algo.local
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ ip address 192.168.1.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ ip access-group 101 in
+ standby version 2
+ standby 10 ip 192.168.10.3
+ standby 10 priority 110
+ standby 10 preempt
+!
+interface GigabitEthernet0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ ip access-group 102 in
+ standby version 2
+ standby 20 ip 192.168.20.3
+ standby 20 priority 110
+ standby 20 preempt
+!
+interface GigabitEthernet0/0.30
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ ip access-group 103 in
+ standby version 2
+ standby 30 ip 192.168.30.3
+ standby 30 priority 110
+ standby 30 preempt
+!
+interface GigabitEthernet0/0.40
+ encapsulation dot1Q 40
+ ip address 192.168.40.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ ip access-group 104 in
+ standby version 2
+ standby 40 ip 192.168.40.3
+ standby 40 priority 110
+ standby 40 preempt
+!
+interface GigabitEthernet0/0.50
+ encapsulation dot1Q 50
+ ip address 192.168.50.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ ip access-group 105 in
+ standby version 2
+ standby 50 ip 192.168.50.3
+ standby 50 priority 110
+ standby 50 preempt
+!
+interface GigabitEthernet0/0.60
+ encapsulation dot1Q 60
+ ip address 192.168.60.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ ip access-group 106 in
+ standby version 2
+ standby 60 ip 192.168.60.3
+ standby 60 priority 110
+ standby 60 preempt
+!
+interface GigabitEthernet0/0.99
+ encapsulation dot1Q 99
+ ip address 192.168.99.1 255.255.255.0
+ standby version 2
+ standby 99 ip 192.168.99.3
+ standby 99 priority 110
+ standby 99 preempt
+!
+interface GigabitEthernet0/0.150
+ encapsulation dot1Q 150
+ ip address 192.168.150.1 255.255.255.0
+ ip helper-address 192.168.99.10
+ ip nat inside
+ standby version 2
+ standby 150 ip 192.168.150.3
+ standby 150 priority 110
+ standby 150 preempt
+!
+interface GigabitEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface GigabitEthernet0/2
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Serial0/0/0
+ ip address 10.0.0.2 255.0.0.0
+ ip nat outside
+ clock rate 9600
+!
+interface Serial0/0/1
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 100
+ log-adjacency-changes
+ network 192.168.1.0 0.0.0.255 area 0
+ network 10.0.0.0 0.255.255.255 area 0
+!
+ip nat pool algo 200.100.100.1 200.100.100.254 netmask 255.255.255.0
+ip nat inside source list 1 pool algo overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 Serial0/0/0 0.0.0.0 
+!
+ip flow-export version 9
+!
+!
+access-list 1 permit 192.168.0.0 0.0.255.255
+access-list 101 permit udp any any eq bootps
+access-list 101 permit udp 192.168.10.0 0.0.0.255 host 192.168.99.10 eq domain
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 host 192.168.99.10 eq www
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 host 192.168.99.10 eq 443
+access-list 101 deny ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 101 deny ip 192.168.10.0 0.0.0.255 192.168.60.0 0.0.0.255
+access-list 101 deny ip 192.168.10.0 0.0.0.255 192.168.0.0 0.0.255.255
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 any eq www
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 any eq 443
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 any eq 587
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 any eq 993
+access-list 101 deny ip any any
+access-list 102 permit udp any any eq bootps
+access-list 102 permit udp 192.168.20.0 0.0.0.255 host 192.168.99.10 eq domain
+access-list 102 permit tcp 192.168.20.0 0.0.0.255 host 192.168.99.10 eq 443
+access-list 102 permit tcp 192.168.20.0 0.0.0.255 host 192.168.99.10 eq www
+access-list 102 deny ip 192.168.20.0 0.0.0.255 192.168.0.0 0.0.255.255
+access-list 102 permit tcp 192.168.20.0 0.0.0.255 any eq 443
+access-list 102 permit tcp 192.168.20.0 0.0.0.255 any eq www
+access-list 102 deny ip any any
+access-list 104 permit udp any any eq bootps
+access-list 104 permit udp 192.168.40.0 0.0.0.255 host 192.168.99.10 eq domain
+access-list 104 permit tcp 192.168.40.0 0.0.0.255 host 192.168.99.10 eq www
+access-list 104 permit tcp 192.168.40.0 0.0.0.255 host 192.168.99.10 eq 443
+access-list 104 permit tcp 192.168.40.0 0.0.0.255 192.168.150.0 0.0.0.255 eq 2000
+access-list 104 deny ip 192.168.40.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 104 deny ip 192.168.40.0 0.0.0.255 192.168.60.0 0.0.0.255
+access-list 104 deny tcp 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255 eq 22
+access-list 104 deny tcp 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255 eq telnet
+access-list 104 deny ip 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255
+access-list 104 permit tcp 192.168.40.0 0.0.0.255 any eq www
+access-list 104 permit tcp 192.168.40.0 0.0.0.255 any eq 443
+access-list 104 permit tcp 192.168.40.0 0.0.0.255 any eq 587
+access-list 104 permit tcp 192.168.40.0 0.0.0.255 any eq 993
+access-list 104 deny ip any any
+access-list 105 permit udp any any eq bootps
+access-list 105 permit udp 192.168.50.0 0.0.0.255 host 192.168.99.10 eq domain
+access-list 105 permit tcp 192.168.50.0 0.0.0.255 host 192.168.99.10 eq www
+access-list 105 permit tcp 192.168.50.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 3389
+access-list 105 permit tcp 192.168.50.0 0.0.0.255 192.168.40.0 0.0.0.255 eq 3389
+access-list 105 permit tcp 192.168.50.0 0.0.0.255 192.168.60.0 0.0.0.255 eq 3389
+access-list 105 deny tcp 192.168.50.0 0.0.0.255 192.168.0.0 0.0.255.255 eq 22
+access-list 105 deny tcp 192.168.50.0 0.0.0.255 192.168.0.0 0.0.255.255 eq telnet
+access-list 105 deny ip 192.168.50.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 105 permit icmp 192.168.50.0 0.0.0.255 any echo
+access-list 105 permit tcp 192.168.50.0 0.0.0.255 any eq www
+access-list 105 permit tcp 192.168.50.0 0.0.0.255 any eq 443
+access-list 105 deny ip any any
+access-list 106 permit udp any any eq bootps
+access-list 106 permit tcp 192.168.60.0 0.0.0.255 host 192.168.99.10 eq www
+access-list 106 permit tcp 192.168.60.0 0.0.0.255 host 192.168.99.10 eq 443
+access-list 106 deny ip 192.168.60.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 106 deny tcp 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255 eq 22
+access-list 106 deny tcp 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255 eq telnet
+access-list 106 deny ip 192.168.60.0 0.0.0.255 192.168.10.0 0.0.0.255
+access-list 106 deny ip 192.168.60.0 0.0.0.255 192.168.40.0 0.0.0.255
+access-list 106 permit tcp 192.168.60.0 0.0.0.255 any eq 443
+access-list 106 permit tcp 192.168.60.0 0.0.0.255 any eq www
+access-list 106 permit tcp 192.168.60.0 0.0.0.255 any eq 22
+access-list 106 permit icmp 192.168.60.0 0.0.0.255 any echo
+access-list 106 deny ip any any
+access-list 103 permit udp any any eq bootps
+access-list 103 permit ip 192.168.30.0 0.0.0.255 192.168.0.0 0.0.255.255
+access-list 103 permit icmp 192.168.30.0 0.0.0.255 any
+access-list 103 permit tcp 192.168.30.0 0.0.0.255 any
+access-list 103 permit udp 192.168.30.0 0.0.0.255 any
+access-list 103 deny ip any any
+!
+!
+!
+!
+!
+logging trap debugging
+logging 192.168.99.10
+telephony-service
+ max-ephones 7
+ max-dn 7
+ ip source-address 192.168.150.1 port 2000
+ auto assign 1 to 5
+ auto assign 1 to 7
+!
+ephone-dn 1
+ number 1001
+!
+ephone-dn 2
+ number 1002
+!
+ephone-dn 3
+ number 1003
+!
+ephone-dn 4
+ number 1004
+!
+ephone-dn 5
+ number 1005
+!
+ephone-dn 6
+ number 1006
+!
+ephone-dn 7
+ number 1007
+!
+ephone 1
+ device-security-mode none
+ mac-address 00E0.F74D.7347
+ type 7960
+ button 1:1
+!
+ephone 2
+ device-security-mode none
+ mac-address 0050.0F68.31A4
+ type 7960
+ button 1:2
+!
+ephone 3
+ device-security-mode none
+ mac-address 0006.2A5B.24A1
+ type 7960
+ button 1:3
+!
+ephone 4
+ device-security-mode none
+ mac-address 0007.EC0E.A523
+ type 7960
+ button 1:4
+!
+ephone 5
+ device-security-mode none
+ mac-address 0002.1672.9A78
+ type 7960
+ button 1:5
+!
+ephone 6
+ device-security-mode none
+ mac-address 0002.17AB.E0A9
+ type 7960
+ button 1:6
+!
+ephone 7
+ device-security-mode none
+ mac-address 0030.F218.A308
+ type 7960
+ button 1:7
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login local
+ transport input ssh
+!
+!
+ntp server 192.168.99.10
+!
+end
+
